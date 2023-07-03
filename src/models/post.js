@@ -1,49 +1,46 @@
-const sequelize = require('sequelize');
+const { Sequelize, DataTypes, Model } = require('sequelize');
 
 const DB_DATABASE = process.env.DB_DATABASE || "kubedevnews";
 const DB_USERNAME = process.env.DB_USERNAME || "kubedevnews";
 const DB_PASSWORD = process.env.DB_PASSWORD || "Pg#123";
-const DB_HOST = process.env.DB_HOST || "localhost";
+const DB_HOST = process.env.DB_HOST || "postgres";
 
-const seque = new sequelize.Sequelize(DB_DATABASE, DB_USERNAME, DB_PASSWORD, {
-    host: DB_HOST,
-    dialect: 'postgres'
-  });
+console.log("DB_DATABASE:", DB_DATABASE);
+console.log("DB_USERNAME:", DB_USERNAME);
+console.log("DB_PASSWORD:", DB_PASSWORD);
+console.log("DB_HOST:", DB_HOST);
 
-class Post extends sequelize.Model {
-  
-  save() {
-    
-    console.log('Entrou')
-    super.save();
-  }
-}
+const sequelize = new Sequelize(DB_DATABASE, DB_USERNAME, DB_PASSWORD, {
+  host: DB_HOST,
+  dialect: 'postgres'
+});
+
+class Post extends Model {}
 
 Post.init({
   title: {
-    type: sequelize.DataTypes.STRING,
-    require: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
   summary: {
-    type: sequelize.DataTypes.STRING,
-    require: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
   publishDate: {
-    type: sequelize.DataTypes.DATEONLY,
-    require: true
+    type: DataTypes.DATEONLY,
+    allowNull: false
   },
   content: {
-    type: sequelize.DataTypes.STRING,
-    require: true
-  },
+    type: DataTypes.STRING,
+    allowNull: false
+  }
 }, {
-  sequelize: seque, // We need to pass the connection instance
-  modelName: 'Post' // We need to choose the model name
-})
+  sequelize,
+  modelName: 'Post'
+});
 
-exports.initDatabase = () => {
-    seque.sync({ alter: true })
-}
+exports.initDatabase = async () => {
+  await sequelize.sync({ alter: true });
+};
 
 exports.Post = Post;
-
